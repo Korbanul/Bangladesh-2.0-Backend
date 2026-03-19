@@ -37,7 +37,7 @@ public class WebSecurityChainConfig {
                 // 3. Define Permissions
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll() // Match any auth sub-paths
-                .antMatchers("/admin/**").permitAll() // Match any auth sub-paths
+//                .antMatchers("/admin/**").permitAll() // Match any auth sub-paths
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -54,6 +54,7 @@ public class WebSecurityChainConfig {
 //        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); //For Local
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

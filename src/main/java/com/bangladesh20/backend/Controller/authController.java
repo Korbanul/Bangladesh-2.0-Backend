@@ -43,7 +43,7 @@ public class authController {
                 .secure(true)//Allow only HTTPS
 //                .secure(false) //allow HTTP For Local
                 .path("/")
-                .maxAge(60*1*1)
+                .maxAge(60*1*10)
                 .sameSite("None")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
