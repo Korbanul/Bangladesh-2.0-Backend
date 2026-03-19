@@ -1,6 +1,7 @@
 package com.bangladesh20.backend.Security;
 
 import com.bangladesh20.backend.Entity.Users;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,15 @@ public class JwtTokenGenerate {
                 .expiration(new Date(System.currentTimeMillis()+1000*60*10))
                 .signWith(getSecrectKey())
                 .compact();
+    }
+
+    public String getUsernameFromToken(String token){
+        Claims claims=Jwts.parser()
+                .verifyWith(getSecrectKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.getSubject();
     }
 
 }

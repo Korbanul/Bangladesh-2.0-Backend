@@ -10,6 +10,7 @@ import lombok.*;
 public class LoginResponseDto {
     private Long id;
     private String jwttoken;
+    private String username;
 
 
 }

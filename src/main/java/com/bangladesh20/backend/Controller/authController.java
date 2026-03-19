@@ -7,12 +7,16 @@ import com.bangladesh20.backend.Dto.Auth.SignUpResponseDto;
 import com.bangladesh20.backend.Service.authService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
 
 @AllArgsConstructor
 //@RequiredArgsConstructor
@@ -28,8 +32,27 @@ public class authController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> logIn(@RequestBody LoginRequestDto loginRequestDto){
+    public ResponseEntity<LoginResponseDto> logIn(@RequestBody LoginRequestDto loginRequestDto,HttpServletResponse response){
 
-        return ResponseEntity.ok(authService.Login(loginRequestDto));
+            LoginResponseDto loginResponseDto=authService.Login(loginRequestDto);
+            String token =loginResponseDto.getJwttoken();
+    //Setting the cookie for Browser.
+        ResponseCookie cookie=ResponseCookie
+                .from("token",token)
+                .httpOnly(true)
+                .secure(true)//Allow only HTTPS
+//                .secure(false) //allow HTTP
+                .path("/")
+                .maxAge(60*1*1)
+                .sameSite("Strict")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        loginResponseDto.setJwttoken(null);
+        return ResponseEntity.ok(loginResponseDto);
     }
+    @PostMapping("/logout")
+    public ResponseEntity<?> Logout(HttpServletResponse response){
+        return ResponseEntity.ok( authService.logout(response));
+    }
+
 }
