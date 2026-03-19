@@ -44,7 +44,7 @@ public class authController {
 //                .secure(false) //allow HTTP For Local
                 .path("/")
                 .maxAge(60*1*1)
-                .sameSite("Strict")
+                .sameSite("None")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         loginResponseDto.setJwttoken(null);
