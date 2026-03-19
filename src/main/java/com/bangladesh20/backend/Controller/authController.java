@@ -43,6 +43,7 @@ public class authController {
                 .secure(true)//Allow only HTTPS
 //                .secure(false) //allow HTTP For Local
                 .path("/")
+                .domain("bangladesh-20-backend-production.up.railway.app")
                 .maxAge(60*1*10)
                 .sameSite("None")
                 .build();
