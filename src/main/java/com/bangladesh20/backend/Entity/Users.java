@@ -53,7 +53,7 @@ public class Users implements UserDetails {
     private String password;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = true)
     private LocalDateTime createdAt;
 
     //Adding Roles
