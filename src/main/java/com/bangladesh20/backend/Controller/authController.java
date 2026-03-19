@@ -41,7 +41,7 @@ public class authController {
                 .from("token",token)
                 .httpOnly(true)
                 .secure(true)//Allow only HTTPS
-//                .secure(false) //allow HTTP
+//                .secure(false) //allow HTTP For Local
                 .path("/")
                 .maxAge(60*1*1)
                 .sameSite("Strict")
