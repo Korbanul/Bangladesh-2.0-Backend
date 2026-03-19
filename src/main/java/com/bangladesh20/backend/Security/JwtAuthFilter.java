@@ -16,9 +16,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
-
 @Component
 @Slf4j
 @RequiredArgsConstructor
