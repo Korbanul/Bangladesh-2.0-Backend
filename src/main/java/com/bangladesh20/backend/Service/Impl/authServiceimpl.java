@@ -69,14 +69,14 @@ public class authServiceimpl implements com.bangladesh20.backend.Service.authSer
 
     @Override
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from("token", "")
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(0) // 🔥 delete cookie
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+//        ResponseCookie cookie = ResponseCookie.from("token", "")
+//                .httpOnly(true)
+//                .secure(true)
+//                .path("/")
+//                .maxAge(0) // 🔥 delete cookie
+//                .build();
+//
+//        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return ResponseEntity.ok("Logout Successful");
     }
 }

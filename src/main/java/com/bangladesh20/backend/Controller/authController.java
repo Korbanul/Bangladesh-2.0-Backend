@@ -35,20 +35,19 @@ public class authController {
     public ResponseEntity<LoginResponseDto> logIn(@RequestBody LoginRequestDto loginRequestDto,HttpServletResponse response){
 
             LoginResponseDto loginResponseDto=authService.Login(loginRequestDto);
-            String token =loginResponseDto.getJwttoken();
-    //Setting the cookie for Browser.
-        ResponseCookie cookie=ResponseCookie
-                .from("token",token)
-                .httpOnly(true)
-                .secure(true)//Allow only HTTPS
-//                .secure(false) //allow HTTP For Local
-                .path("/")
-                .domain("bangladesh-20-backend-production.up.railway.app")
-                .maxAge(60*1*10)
-                .sameSite("None")
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        loginResponseDto.setJwttoken(null);
+//            String token =loginResponseDto.getJwttoken();
+//    //Setting the cookie for Browser.
+//        ResponseCookie cookie=ResponseCookie
+//                .from("token",token)
+//                .httpOnly(true)
+//                .secure(true)//Allow only HTTPS
+////                .secure(false) //allow HTTP For Local
+//                .path("/")
+//                .maxAge(60*1*10)
+//                .sameSite("None")
+//                .build();
+//        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+//        loginResponseDto.setJwttoken(null);
         return ResponseEntity.ok(loginResponseDto);
     }
     @PostMapping("/logout")
