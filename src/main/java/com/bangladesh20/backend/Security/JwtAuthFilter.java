@@ -27,33 +27,33 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             log.info("Incoming request{}", request.getRequestURI());
-            String token = null;
+//            String token = null;
 
-            // ✅ Get token from Header
-//            final String requestTokenHeader = request.getHeader("Authorization");
-//
-//            if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer")) {
-//                filterChain.doFilter(request, response);
-//                return;
-//            }
-//
-//            String Token = requestTokenHeader.split("Bearer ")[1];
+//             ✅ Get token from Header
+            final String requestTokenHeader = request.getHeader("Authorization");
 
-            // ✅ Get token from cookies when we use middleware in frontend
-            if (request.getCookies() != null) {
-                for (Cookie cookie : request.getCookies()) {
-                    if ("token".equals(cookie.getName())) {
-                        token = cookie.getValue();
-                    }
-                }
-            }
-            if (token == null) {
+            if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer")) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
+            String Token = requestTokenHeader.split("Bearer ")[1];
 
-            String username = jwtTokenGenerate.getUsernameFromToken(token);
+//            // ✅ Get token from cookies when we use middleware in frontend
+//            if (request.getCookies() != null) {
+//                for (Cookie cookie : request.getCookies()) {
+//                    if ("token".equals(cookie.getName())) {
+//                        token = cookie.getValue();
+//                    }
+//                }
+//            }
+//            if (token == null) {
+//                filterChain.doFilter(request, response);
+//                return;
+//            }
+
+
+            String username = jwtTokenGenerate.getUsernameFromToken(Token);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 final Users users = authRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
