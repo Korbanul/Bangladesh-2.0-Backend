@@ -27,41 +27,45 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             log.info("Incoming request{}", request.getRequestURI());
-//            String token = null;
+            String token = null;
 
-//             ✅ Get token from Header
-            final String requestTokenHeader = request.getHeader("Authorization");
+//            // ✅ Strategy 1: Read from Authorization header (Postman / mobile)
+//            final String requestTokenHeader = request.getHeader("Authorization");
+//            if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+//                token = requestTokenHeader.split("Bearer ")[1];
+//            }
 
-            if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer")) {
+            // Strategy 2: Read from Cookie (Next.js rewrites / browser)
+            if (token == null && request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if ("token".equals(cookie.getName())) {
+                        token = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+
+            //No token found — skip auth, let Security decide (401/403)
+            if (token == null) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            String Token = requestTokenHeader.split("Bearer ")[1];
-
-//            // ✅ Get token from cookies when we use middleware in frontend
-//            if (request.getCookies() != null) {
-//                for (Cookie cookie : request.getCookies()) {
-//                    if ("token".equals(cookie.getName())) {
-//                        token = cookie.getValue();
-//                    }
-//                }
-//            }
-//            if (token == null) {
-//                filterChain.doFilter(request, response);
-//                return;
-//            }
-
-
-            String username = jwtTokenGenerate.getUsernameFromToken(Token);
+            // Validate and set authentication
+            String username = jwtTokenGenerate.getUsernameFromToken(token);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                final Users users = authRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-                UsernamePasswordAuthenticationToken token1 = new UsernamePasswordAuthenticationToken(users, null, users.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(token1);
+                Users users = authRepository.findByUsername(username)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
 
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(users, null, users.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+
             filterChain.doFilter(request, response);
+
         } catch (Exception ex) {
             log.error("JWT Filter error: {}", ex.getMessage());
             filterChain.doFilter(request, response);
