@@ -51,6 +51,7 @@ public class WebSecurityChainConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(Arrays.asList("https://bangladesh-20-production.up.railway.app"));
+        configuration.setAllowedOrigins(Arrays.asList("bangladesh-20-backend-production-07c7.up.railway.app"));
 //        configuration.setAllowedOrigins(Arrays.asList("https://shanto-bangladesh-2-0.netlify.app"));
 //        configuration.setAllowedOrigins(Arrays.asList("*"));
 //        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); //For Local
