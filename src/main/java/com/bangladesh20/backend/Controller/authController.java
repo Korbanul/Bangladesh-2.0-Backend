@@ -23,36 +23,48 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/auth")
 public class authController {
-    private  final authService authService;
+    private final authService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<SignUpResponseDto>signUp(@RequestBody SignUpRequestDto signUpRequestDto){
+    public ResponseEntity<SignUpResponseDto> signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.createUser(signUpRequestDto));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> logIn(@RequestBody LoginRequestDto loginRequestDto,HttpServletResponse response){
+    public ResponseEntity<LoginResponseDto> logIn(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
 
-            LoginResponseDto loginResponseDto=authService.Login(loginRequestDto);
-            String token =loginResponseDto.getJwttoken();
-    //Setting the cookie for Browser.
-        ResponseCookie cookie=ResponseCookie
-                .from("token",token)
+        LoginResponseDto loginResponseDto = authService.Login(loginRequestDto);
+        String token = loginResponseDto.getJwttoken();
+        //Setting the cookie for Browser.
+        ResponseCookie cookie = ResponseCookie
+                .from("token", token)
                 .httpOnly(true)
                 .secure(true)//Allow only HTTPS
 //                .secure(false) //allow HTTP For Local
                 .path("/")
-                .maxAge(60*1*10)
-                .sameSite("None")
+                .maxAge(60 * 1 * 10)
+                .sameSite("sameSite")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         loginResponseDto.setJwttoken(null);
         return ResponseEntity.ok(loginResponseDto);
     }
+
     @PostMapping("/logout")
-    public ResponseEntity<?> Logout(HttpServletResponse response){
-        return ResponseEntity.ok( authService.logout(response));
+    public ResponseEntity<?> Logout(HttpServletResponse response) {
+
+        ResponseCookie cookie = ResponseCookie
+                .from("token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("sameSite")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        return ResponseEntity.ok(authService.logout(response));
     }
 
 }
