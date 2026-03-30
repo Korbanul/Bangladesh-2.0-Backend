@@ -54,7 +54,7 @@ public class WebSecurityChainConfig {
 //        configuration.setAllowedOrigins(Arrays.asList("https://shanto-bangladesh-2-0.netlify.app"));
 //        configuration.setAllowedOrigins(Arrays.asList("*"));
 //        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); //For Local
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));//Must add all type of request else CORS error not allowed will appear
 //        configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
 //        configuration.setAllowCredentials(false);
 

@@ -26,7 +26,7 @@ public class JwtTokenGenerate {
     public String JwtTokenGenerate(Users users)
     {
         return Jwts.builder()
-                .subject(users.getUsername())
+                .subject(users.getId().toString())
                 .claim("userId",users.getId().toString())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis()+1000*60*15))
@@ -34,7 +34,7 @@ public class JwtTokenGenerate {
                 .compact();
     }
 
-    public String getUsernameFromToken(String token){
+    public String getUserByIdFromToken(String token){
         Claims claims=Jwts.parser()
                 .verifyWith(getSecrectKey())
                 .build()

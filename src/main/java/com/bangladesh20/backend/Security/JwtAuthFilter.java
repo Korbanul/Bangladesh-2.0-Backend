@@ -51,11 +51,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // Validate and set authentication
-            String username = jwtTokenGenerate.getUsernameFromToken(token);
+            // Validate and set authentication here
+            // here using id Instead of username. Because when user update username then this token will not valid , username will not mathched beacsue it changed.
+            String id = jwtTokenGenerate.getUserByIdFromToken(token);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                Users users = authRepository.findByUsername(username)
+            if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                Long userId = Long.parseLong(id);
+                Users users = authRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("User not found"));
 
                 UsernamePasswordAuthenticationToken authToken =
