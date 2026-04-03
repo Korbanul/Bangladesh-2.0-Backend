@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,6 +23,8 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtTokenGenerate jwtTokenGenerate;
     private final authRepository authRepository;
+
+    private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -70,6 +73,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         } catch (Exception ex) {
             log.error("JWT Filter error: {}", ex.getMessage());
+            handlerExceptionResolver.resolveException(request,response,null,ex); //This will throw Exception into globalExceptionHandler.
+            // Because By default filter chain error don't go to globalException handler
+            // By default Global Exception handler only works on MVC architechture not filter chain.
             filterChain.doFilter(request, response);
         }
 
