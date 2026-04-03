@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
         log.warn("Failed login attempt at: {}", request.getRequestURI());
 
        ApiError apiError= ApiError.builder()
-                .statusCode(HttpStatus.UNAUTHORIZED)
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .error(exception.getMessage())
                 .errorMessage("Wrong username or password")
                 .timeStamp(LocalDateTime.now())
@@ -42,12 +42,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> JWTTokenExpairError(ExpiredJwtException exception, HttpServletRequest request) {
         log.warn("Token Expair: {}", request.getRequestURI());
         ApiError apiError = ApiError.builder()
-                .statusCode(HttpStatus.UNAUTHORIZED)
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .error(exception.getMessage())
                 .errorMessage("Session expired. Please login again.")
                 .timeStamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(apiError);
     }
 
 
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> JWTTokenErrors(JwtException exception, HttpServletRequest request) {
         log.warn("Invalid JWT at: {}", request.getRequestURI());
         ApiError apiError = ApiError.builder()
-                .statusCode(HttpStatus.UNAUTHORIZED)
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .error(exception.getMessage())
                 .errorMessage("Invalid or malformed token.")
                 .timeStamp(LocalDateTime.now())
@@ -70,12 +70,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> AccessDeniedError(AccessDeniedException exception, HttpServletRequest request) {
         log.warn("Access denied at: {} ", request.getRequestURI());
         ApiError apiError = ApiError.builder()
-                .statusCode(HttpStatus.FORBIDDEN)
+                .statusCode(HttpStatus.FORBIDDEN.value())
                 .error(exception.getMessage())
                 .errorMessage("You don't have permission to access this resource.")
                 .timeStamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiError);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).body(apiError);
 
 
     }
@@ -94,13 +94,13 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
 
         ApiError apiError = ApiError.builder()
-                .statusCode(HttpStatus.BAD_REQUEST)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .error(fieldErrors)
                 .errorMessage("Validation Failed")
                 .timeStamp(LocalDateTime.now())
                 .build();
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(apiError);
     }
 
 
@@ -115,12 +115,12 @@ public class GlobalExceptionHandler {
                 .map(v -> v.getPropertyPath() + ": " + v.getMessage())
                 .collect(Collectors.joining(", "));
         ApiError apiError = ApiError.builder()
-                .statusCode(HttpStatus.BAD_REQUEST)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .error(errorMessages)
                 .errorMessage("Constraint Violation")
                 .timeStamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(apiError);
     }
 
     // NOT FOUND ERRORS
@@ -128,24 +128,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> NotFoundError(EntityNotFoundException exception, HttpServletRequest request) {
         log.warn("Entity not found at: {}", request.getRequestURI());
         ApiError apiError = ApiError.builder()
-                .statusCode(HttpStatus.NOT_FOUND)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .error(exception.getMessage())
                 .errorMessage("Resource Not Found")
                 .timeStamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(apiError);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ApiError> NotFoundError2(NoSuchElementException exception, HttpServletRequest request) {
         log.warn("Entity not found at: {}", request.getRequestURI());
         ApiError apiError = ApiError.builder()
-                .statusCode(HttpStatus.NOT_FOUND)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .error(exception.getMessage())
                 .errorMessage("Resource Not Found")
                 .timeStamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(apiError);
     }
 
     // CONFLICT ERRORS If user Already Exists.
@@ -155,12 +155,12 @@ public ResponseEntity<ApiError> HandleUniqueValueError(DataIntegrityViolationExc
     {
         log.error("Data integrity violation at: {}", request.getRequestURI());
         ApiError apiError= ApiError.builder()
-                .statusCode(HttpStatus.CONFLICT)
+                .statusCode(HttpStatus.CONFLICT.value())
                 .error(exception.getMostSpecificCause().getMessage())
                 .errorMessage("Value must be unique")
                 .timeStamp(LocalDateTime.now())
                 .build();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(apiError);
     }
 
     // CATCH-ALL ERRORS — If No of the above then this will call
@@ -173,13 +173,13 @@ public ResponseEntity<ApiError> HandleUniqueValueError(DataIntegrityViolationExc
         log.error("Unexpected error at: {}", request.getRequestURI(), exception);
 
         ApiError apiError = ApiError.builder()
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error(exception.getMessage())
                 .errorMessage("Something went wrong. Please try again later.")
                 .timeStamp(LocalDateTime.now())
                 .build();
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.value()).body(apiError);
     }
 
 

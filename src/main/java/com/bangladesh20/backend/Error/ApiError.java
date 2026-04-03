@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class ApiError {
-    private HttpStatus statusCode;
+    private int statusCode;
     private String error;
     private String errorMessage;
     private LocalDateTime timeStamp;
