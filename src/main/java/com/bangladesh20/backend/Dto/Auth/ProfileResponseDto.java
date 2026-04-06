@@ -20,7 +20,8 @@ import java.util.Set;
 public class ProfileResponseDto {
     private String username;
     private String email;
-    private String Roles;
+//    private String Roles;
+    private Set<String> roles;
     private String profession;
     private Gender gender;
     private LocalDate dob;

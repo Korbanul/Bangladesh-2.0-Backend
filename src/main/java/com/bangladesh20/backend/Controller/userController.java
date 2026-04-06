@@ -5,6 +5,7 @@ import com.bangladesh20.backend.Entity.Users;
 import com.bangladesh20.backend.Service.userService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +17,14 @@ import javax.validation.Valid;
 public class userController {
     private final userService userService;
     @GetMapping("/profile")
+    @PreAuthorize("hasAuthority('profile:read')")
     public ResponseEntity<ProfileResponseDto> getProfile(@AuthenticationPrincipal Users users) {  // pulled from JWT, no body needed
 
         return ResponseEntity.ok(userService.getUser(users.getId()));
     }
 
     @PatchMapping("/profile/updateprofile")
+    @PreAuthorize("hasAuthority('profile:write')")
     public ResponseEntity updateUser(@AuthenticationPrincipal Users users, @RequestBody @Valid  UserUpdateDto userUpdateDto){
         //@Valid will check the Dto data with requirment set in my dto file.
         return ResponseEntity.ok(userService.updateUser(users.getId(),userUpdateDto));

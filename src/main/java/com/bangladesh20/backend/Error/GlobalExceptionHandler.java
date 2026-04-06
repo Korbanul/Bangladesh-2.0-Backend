@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
-import java.nio.file.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
         ApiError apiError = ApiError.builder()
                 .statusCode(HttpStatus.FORBIDDEN.value())
                 .error(exception.getMessage())
-                .errorMessage("You don't have permission to access this resource.")
+                .errorMessage("You don't have permission.")
                 .timeStamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).body(apiError);
@@ -149,6 +149,33 @@ public class GlobalExceptionHandler {
     }
 
     // CONFLICT ERRORS If user Already Exists.
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleUserAlreadyExists(
+            UserAlreadyExistsException exception, HttpServletRequest request) {
+        log.warn("Duplicate user attempt at: {}", request.getRequestURI());
+        ApiError apiError = ApiError.builder()
+                .statusCode(HttpStatus.CONFLICT.value())
+                .error(exception.getMessage())
+                .errorMessage("User with this username already exists.")
+                .timeStamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT.value()).body(apiError);
+    }
+    // GlobalExceptionHandler.java
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiError> handleRuntimeException(
+            RuntimeException exception, HttpServletRequest request) {
+        log.error("Runtime error at: {}", request.getRequestURI(), exception);
+        ApiError apiError = ApiError.builder()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .error(exception.getMessage())
+                .errorMessage("Resource not found.")
+                .timeStamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(apiError);
+    }
+
+
     // Duplicate email, username, unique constraint violation in DB
     @ExceptionHandler(DataIntegrityViolationException.class)
 public ResponseEntity<ApiError> HandleUniqueValueError(DataIntegrityViolationException exception,HttpServletRequest request)

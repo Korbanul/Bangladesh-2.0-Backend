@@ -3,6 +3,7 @@ package com.bangladesh20.backend.Service.Impl;
 
 import com.bangladesh20.backend.Dto.Auth.ProfileResponseDto;
 import com.bangladesh20.backend.Dto.Userservice.UserUpdateDto;
+import com.bangladesh20.backend.Entity.Role;
 import com.bangladesh20.backend.Entity.Type.Gender;
 import com.bangladesh20.backend.Entity.Users;
 import com.bangladesh20.backend.Repository.authRepository;
@@ -11,6 +12,9 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -23,11 +27,11 @@ public class userServiceImple implements userService {
     public ProfileResponseDto getUser(Long id) {
         Users user = authRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User does not exist"));
+        Set<String> roles = user.getRoles().stream()
+                .map(Role::getName)          // ← getName(), not name()
+                .collect(Collectors.toSet());
 
-
-        return new ProfileResponseDto(user.getUsername(), user.getEmail(), user.getRoles().stream()
-                .map(role -> role.name())
-                .collect(java.util.stream.Collectors.joining(", ")), user.getProfession(), user.getGender(), user.getDob(), user.getCreatedAt());
+        return new ProfileResponseDto(user.getUsername(), user.getEmail(), roles, user.getProfession(), user.getGender(), user.getDob(), user.getCreatedAt());
     }
 
     @Override

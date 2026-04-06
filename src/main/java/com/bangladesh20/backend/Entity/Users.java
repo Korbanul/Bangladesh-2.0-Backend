@@ -1,7 +1,6 @@
 package com.bangladesh20.backend.Entity;
 
 import com.bangladesh20.backend.Entity.Type.Gender;
-import com.bangladesh20.backend.Entity.Type.RoleType;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,9 +12,9 @@ import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -56,16 +55,23 @@ public class Users implements UserDetails {
     @Column(nullable = true)
     private LocalDateTime createdAt;
 
-    //Adding Roles
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    Set<RoleType> Roles=new HashSet<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
 
+    @Builder.Default
+    private Set<Role> Roles = new HashSet<>();
+
+    // Returns ROLE_USER + patient:read + appointment:write etc.
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        return Roles.stream()
+                .flatMap(role -> role.getAllAuthorities().stream())
+                .collect(Collectors.toSet());
     }
-
     @Override
     public boolean isAccountNonExpired() {
         return true;

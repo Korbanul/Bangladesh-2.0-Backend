@@ -4,12 +4,18 @@ import com.bangladesh20.backend.Dto.Auth.LoginRequestDto;
 import com.bangladesh20.backend.Dto.Auth.LoginResponseDto;
 import com.bangladesh20.backend.Dto.Auth.SignUpRequestDto;
 import com.bangladesh20.backend.Dto.Auth.SignUpResponseDto;
+import com.bangladesh20.backend.Entity.Role;
 import com.bangladesh20.backend.Entity.Type.Gender;
 import com.bangladesh20.backend.Entity.Type.RoleType;
 import com.bangladesh20.backend.Entity.Users;
+import com.bangladesh20.backend.Error.UserAlreadyExistsException;
+import com.bangladesh20.backend.Repository.RoleRepository;
 import com.bangladesh20.backend.Repository.authRepository;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.bangladesh20.backend.Security.JwtTokenGenerate;
 import lombok.AllArgsConstructor;
@@ -33,13 +39,19 @@ public class authServiceimpl implements com.bangladesh20.backend.Service.authSer
     private final ModelMapper modelMapper;
     private final authRepository authRepository;
     private final AuthenticationManager authenticationManager;
+    private final RoleRepository roleRepository;
     private final JwtTokenGenerate jwtTokenGenerate;
 
     @Override
     public SignUpResponseDto createUser(SignUpRequestDto signUpRequestDto) {
         if (authRepository.findByUsername(signUpRequestDto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("User Already Exists");
+            throw new UserAlreadyExistsException("User Already Exists");
         }
+        // ✅ Fetch ROLE_USER from DB — seeded by DataSeeder on startup
+        Role defaultRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("ROLE_USER not found. Check DataSeeder."));
+
+        Set<Role> userRoles = new HashSet<>(Arrays.asList(defaultRole));
 
         Users users = Users.builder()
                 .username(signUpRequestDto.getUsername())
@@ -48,7 +60,7 @@ public class authServiceimpl implements com.bangladesh20.backend.Service.authSer
                 .dob(signUpRequestDto.getDob())
                 .email(signUpRequestDto.getEmail())
                 .password(passwordEncoder.encode(signUpRequestDto.getPassword()))
-                .Roles(Collections.singleton(RoleType.USER))
+                .Roles(userRoles)
                 .build();
         users = authRepository.save(users);
 

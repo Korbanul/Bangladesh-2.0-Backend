@@ -64,8 +64,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         .orElseThrow(() -> new RuntimeException("User not found"));
 
                 UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(users, null, users.getAuthorities());
-
+                        new UsernamePasswordAuthenticationToken(users, null, users.getAuthorities());//returns [ROLE_ADMIN, profile:read, profile:write ...]
+               // Spring Security uses these for @PreAuthorize below setting token for securitycontext that will read by @preauthorize or has role has authority
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
 
