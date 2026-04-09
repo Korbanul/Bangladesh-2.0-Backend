@@ -60,7 +60,7 @@ public class authServiceimpl implements com.bangladesh20.backend.Service.authSer
                 .dob(signUpRequestDto.getDob())
                 .email(signUpRequestDto.getEmail())
                 .password(passwordEncoder.encode(signUpRequestDto.getPassword()))
-                .Roles(userRoles)
+                .roles(userRoles)
                 .build();
         users = authRepository.save(users);
 

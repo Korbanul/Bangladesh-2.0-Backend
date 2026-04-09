@@ -55,20 +55,23 @@ public class Users implements UserDetails {
     @Column(nullable = true)
     private LocalDateTime createdAt;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER) //Because of EAGER, roles are loaded immediately with the user — no lazy loading needed. That's why getAuthorities() works without a separate fetch call (important for Spring Security context).
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-
+    //@ManyToMany is a JPA relationship mapping where two entities relate
+    // to each other through a separate join/junction table — not a column in either
+    // entity's table.
+    //User ↔ Role → a user can have many roles, a role can belong to many users.
     @Builder.Default
-    private Set<Role> Roles = new HashSet<>();
+    private Set<Role> roles = new HashSet<>(); // New user_roles table will be created
 
     // Returns ROLE_USER + patient:read + appointment:write etc.
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Roles.stream()
+        return roles.stream()
                 .flatMap(role -> role.getAllAuthorities().stream())
                 .collect(Collectors.toSet());
     }

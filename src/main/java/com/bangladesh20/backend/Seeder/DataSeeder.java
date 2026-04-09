@@ -49,6 +49,7 @@ public class DataSeeder implements ApplicationRunner {
         Authority viewImage    =createAuthority("image:view");
         Authority donate    =createAuthority("donate:create");
         Authority manageDonate    =createAuthority("donate:manage");
+        Authority manageUser    =createAuthority("user:manage");
         Authority deleteUser    =createAuthority("user:delete");
 
 
@@ -65,7 +66,7 @@ public class DataSeeder implements ApplicationRunner {
                 profileRead, profileWrite,
                 newsRead, newsWrite,
                 deleteUser,manageDonate,
-                addImage
+                addImage,manageUser
         ));
         Role roleAdmin = syncRole("ROLE_ADMIN", adminAuthorities);
 
@@ -81,7 +82,7 @@ public class DataSeeder implements ApplicationRunner {
                     .profession("System Administrator")
                     .gender(com.bangladesh20.backend.Entity.Type.Gender.MALE)
                     .dob(LocalDate.of(1990, 1, 1))
-                    .Roles(adminRoles)
+                    .roles(adminRoles)
                     .build();
 
             userRepository.save(admin);
