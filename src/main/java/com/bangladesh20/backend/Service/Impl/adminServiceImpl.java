@@ -1,7 +1,5 @@
 package com.bangladesh20.backend.Service.Impl;
 
-import com.bangladesh20.backend.Common.Response.ApiResponse;
-import com.bangladesh20.backend.Common.Response.PageMetaData;
 import com.bangladesh20.backend.Dto.AdminDtos.userDetailsDto;
 import com.bangladesh20.backend.Entity.Role;
 import com.bangladesh20.backend.Entity.Users;
@@ -17,10 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,25 +56,25 @@ public class adminServiceImpl implements AdminService {
         }
     }
 
-    private PageMetaData buildPageMetadata(Page<?> page) {
-        int currentPage = page.getNumber();
-        int totalPages = page.getTotalPages();
-        boolean hasNext = page.hasNext();
-        boolean hasPrev = page.hasPrevious();
+//    private PageMetaData buildPageMetadata(Page<?> page) {
+//        int currentPage = page.getNumber();
+//        int totalPages = page.getTotalPages();
+//        boolean hasNext = page.hasNext();
+//        boolean hasPrev = page.hasPrevious();
+//
+//        return PageMetaData.builder()
+//                .currentPage(currentPage)
+//                .pageSize(page.getSize())
+//                .totalElements(page.getTotalElements())
+//                .totalPages(totalPages)
+//                .hasNext(hasNext)
+//                .hasPrevious(hasPrev)
+//                .nextPage(hasNext ? currentPage + 1 : null)   // null = no next
+//                .previousPage(hasPrev ? currentPage - 1 : null)   // null = no previous
+//                .build();
+//    }
 
-        return PageMetaData.builder()
-                .currentPage(currentPage)
-                .pageSize(page.getSize())
-                .totalElements(page.getTotalElements())
-                .totalPages(totalPages)
-                .hasNext(hasNext)
-                .hasPrevious(hasPrev)
-                .nextPage(hasNext ? currentPage + 1 : null)   // null = no next
-                .previousPage(hasPrev ? currentPage - 1 : null)   // null = no previous
-                .build();
-    }
-
-    public ApiResponse<List<userDetailsDto>> getUsers(int page, int size, String search, String
+    public Map<String, Object> getUsers(int page, int size, String search, String
             sortBy, String sortDir, String roleName) {
 
         log.info("Fetching users — page={}, size={}, search={}, sortBy={}, sortDir={}, role={}",
@@ -95,20 +90,24 @@ public class adminServiceImpl implements AdminService {
                     .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
         }
 
+
         // Build Sort
         Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
         // Query
         Page<Users> userPage = resolveQuery(search, role, pageable);
-
+//  Validate AFTER query — we need totalPages first  if user input page=100 then show error
+        if (page > 0 && page >= userPage.getTotalPages()) {
+            throw new RuntimeException("Page " + page + " does not exist. Total pages: " + userPage.getTotalPages());
+        }
         List<userDetailsDto> dtoList = userPage.getContent()
                 .stream()
                 .map(user -> {
                     userDetailsDto dto = modelMapper.map(user, userDetailsDto.class);
                     dto.setRoles(
                             user.getRoles().stream()
-                                    .map(roles -> roles.getName())   // ✅ extract name string
+                                    .map(roles -> roles.getName())   // extract name string
                                     .collect(Collectors.toSet())
                     );
                     dto.setJoined(
@@ -118,9 +117,21 @@ public class adminServiceImpl implements AdminService {
                 })
                 .collect(Collectors.toList());
 // Build pagination metadata with nextPage / previousPage
-        PageMetaData pagination = buildPageMetadata(userPage);
+// PageMetaData pagination = buildPageMetadata(userPage);
+        Map<String, Object> pagination = new HashMap<>();
+        pagination.put("currentPage", userPage.getNumber());
+        pagination.put("totalPages", userPage.getTotalPages());
+        pagination.put("totalElements", userPage.getTotalElements());
+        pagination.put("pageSize", userPage.getSize());
+        pagination.put("hasNext", userPage.hasNext());
+        pagination.put("hasPrevious", userPage.hasPrevious());
 
-        return ApiResponse.success("Users fetched successfully", dtoList, pagination);
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", dtoList);
+        response.put("pagination", pagination);   // ← nested object
+
+        return response;
+
     }
 
 

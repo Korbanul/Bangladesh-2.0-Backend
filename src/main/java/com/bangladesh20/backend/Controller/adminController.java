@@ -1,8 +1,4 @@
 package com.bangladesh20.backend.Controller;
-
-import com.bangladesh20.backend.Common.Response.ApiResponse;
-import com.bangladesh20.backend.Dto.AdminDtos.userDetailsDto;
-import com.bangladesh20.backend.Entity.Role;
 import com.bangladesh20.backend.Service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin")
@@ -27,7 +23,7 @@ public class adminController {
 
     @GetMapping("/users")
     @PreAuthorize(("hasAuthority('user:manage')"))
-    public ResponseEntity<ApiResponse<List<userDetailsDto>>>getUsers(
+    public ResponseEntity<Map<String,Object>>getUsers(
             @RequestParam(defaultValue = "0" ) @Min(0) int page,
             @RequestParam(defaultValue = "10") @Max(100) int size,
             @RequestParam(required = false) String search,
@@ -36,10 +32,8 @@ public class adminController {
             @RequestParam(required = false)String role
             )
     {
-        ApiResponse<List<userDetailsDto>> response= adminService.getUsers(page,size,search,sortBy,sortDir,role);
-        return ResponseEntity.ok(response);
+//        ApiResponse<List<userDetailsDto>> response= adminService.getUsers(page,size,search,sortBy,sortDir,role);
+
+        return ResponseEntity.ok(adminService.getUsers(page,size,search,sortBy,sortDir,role));
     }
-
-
-
 }

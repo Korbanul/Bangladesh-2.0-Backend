@@ -7,11 +7,12 @@ import com.bangladesh20.backend.Entity.Role;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.List;
+import java.util.Map;
 
 public interface AdminService {
 
 
-    ApiResponse<List<userDetailsDto>> getUsers(int page, int size, String search, String sortBy, String sortDir, String role);
+    Map<String,Object> getUsers(int page, int size, String search, String sortBy, String sortDir, String role);
 
 
     Long deleteUser(Long id);
