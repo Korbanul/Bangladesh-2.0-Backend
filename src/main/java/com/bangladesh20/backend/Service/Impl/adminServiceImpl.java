@@ -116,7 +116,7 @@ public class adminServiceImpl implements AdminService {
                     return dto;
                 })
                 .collect(Collectors.toList());
-// Build pagination metadata with nextPage / previousPage
+
 // PageMetaData pagination = buildPageMetadata(userPage);
         Map<String, Object> pagination = new HashMap<>();
         pagination.put("currentPage", userPage.getNumber());
@@ -125,6 +125,9 @@ public class adminServiceImpl implements AdminService {
         pagination.put("pageSize", userPage.getSize());
         pagination.put("hasNext", userPage.hasNext());
         pagination.put("hasPrevious", userPage.hasPrevious());
+        pagination.put("nextPage",userPage.hasNext() ? userPage.getNumber() +1 : null);
+        pagination.put("previousPage",userPage.hasPrevious() ? userPage.getNumber()-1:null);
+
 
         Map<String, Object> response = new HashMap<>();
         response.put("data", dtoList);
