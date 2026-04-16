@@ -39,6 +39,7 @@ public class WebSecurityChainConfig {
                 // 3. Define Permissions
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll() // Match any auth sub-paths
+                .antMatchers("/donate/**").permitAll() // Match any auth sub-paths
 //                .antMatchers("/admin/**").permitAll() // Match any auth sub-paths
                 .anyRequest().authenticated()
                 .and()

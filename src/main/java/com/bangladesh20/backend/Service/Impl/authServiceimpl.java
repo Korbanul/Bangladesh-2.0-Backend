@@ -47,7 +47,7 @@ public class authServiceimpl implements com.bangladesh20.backend.Service.authSer
         if (authRepository.findByUsername(signUpRequestDto.getUsername()).isPresent()) {
             throw new UserAlreadyExistsException("User Already Exists");
         }
-        // ✅ Fetch ROLE_USER from DB — seeded by DataSeeder on startup
+        //Fetch ROLE_USER from DB — seeded by DataSeeder on startup
         Role defaultRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new RuntimeException("ROLE_USER not found. Check DataSeeder."));
 
