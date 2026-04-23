@@ -18,4 +18,6 @@ public interface authRepository extends JpaRepository<Users,Long> {
     Page<Users> findByUsernameContainingIgnoreCase(String name,Pageable pageable);
     Page<Users>findByRolesAndUsernameContainingIgnoreCase(Role role, String name, Pageable pageable);
     Page<Users> findByRoles(Role roles, Pageable pageable);
+
+
 }

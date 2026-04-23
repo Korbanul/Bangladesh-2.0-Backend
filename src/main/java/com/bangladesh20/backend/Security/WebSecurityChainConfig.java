@@ -55,9 +55,9 @@ public class WebSecurityChainConfig {
 
 //        configuration.setAllowedOrigins(Arrays.asList("https://bangladesh-20-production.up.railway.app","https://bangladesh-20-production-192a.up.railway.app")); //Two frontend url last one is updated with my gkislam email
 //        configuration.setAllowedOrigins(Arrays.asList("https://shanto-bangladesh-2-0.netlify.app"));
-        configuration.setAllowedOrigins(Arrays.asList("https://bangladesh-20-production.up.railway.app")); //3rd number
+//        configuration.setAllowedOrigins(Arrays.asList("https://bangladesh-20-production.up.railway.app")); //3rd number
 //        configuration.setAllowedOrigins(Arrays.asList("*"));
-//        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); //For Local
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); //For Local
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));//Must add all type of request else CORS error not allowed will appear
 //        configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
 //        configuration.setAllowCredentials(false);

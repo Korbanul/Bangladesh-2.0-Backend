@@ -1,11 +1,15 @@
 package com.bangladesh20.backend.Service.Impl;
 
 import com.bangladesh20.backend.Dto.AdminDtos.userDetailsDto;
+import com.bangladesh20.backend.Entity.Images;
 import com.bangladesh20.backend.Entity.Role;
 import com.bangladesh20.backend.Entity.Users;
+import com.bangladesh20.backend.Repository.ImagesRepository;
 import com.bangladesh20.backend.Repository.RoleRepository;
 import com.bangladesh20.backend.Repository.authRepository;
+import com.bangladesh20.backend.Repository.donationRepository;
 import com.bangladesh20.backend.Service.AdminService;
+import com.cloudinary.Cloudinary;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -13,8 +17,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +35,9 @@ public class adminServiceImpl implements AdminService {
     private final authRepository authRepository;
     private final ModelMapper modelMapper;
     private final RoleRepository roleRepository;
+    private final Cloudinary cloudinary;
+    private final ImagesRepository imagesRepository;
+    private final donationRepository donationRepository;
 
     @Override
     public Long deleteUser(Long id) {
@@ -34,6 +47,86 @@ public class adminServiceImpl implements AdminService {
         authRepository.deleteById(id);
         return id;
     }
+
+
+
+    @Override
+    public Map UploadImage(MultipartFile file) {
+        Map<String, Object> options = new HashMap();
+        String publicId = null;  // track publicId for rollback
+//        This Map is the options/config you send to Cloudinary telling it how to handle your upload.
+//         Think of it as query parameters for the Cloudinary API.
+        options.put("folder", "admin-uploads");
+        options.put("resource_type", "image");
+        try {
+            Map result = cloudinary.uploader().upload(file.getBytes(), options);
+                    publicId=(String) result.get("public_id");
+            Images images=Images.builder()
+                    .imageUrl((String) result.get("secure_url"))
+                    .format((String) result.get("format"))
+                    .publicId((String) result.get("public_id"))
+                    .sizeBytes(((Number) result.get("bytes")).longValue())
+                    .width((int)result.get("width"))
+                    .height((int)result.get("height"))
+
+                    .build();
+
+            images.setOriginalFileName(file.getOriginalFilename());
+
+            imagesRepository.save(images);
+            return result;
+        } catch (IOException e) {
+
+            throw new RuntimeException("Image Upload Exception From Cloudinary" + e.getMessage());
+        }catch (Exception e) {
+            // This will run when image already uploaded to the cloudinary but due to any error details not saved to our DB
+            // Then we need to delete the image form cloudinary. To avoid duplicate image in Cloudinary.
+            if (publicId != null) {
+                try {
+                    cloudinary.uploader().destroy(publicId, new HashMap<>());
+                    log.warn("Rolled back Cloudinary upload: {}", publicId);
+                } catch (IOException rollbackEx) {
+                    // If delete failed
+                    log.error("Cloudinary rollback failed for publicId: {}. Manual cleanup needed.", publicId);
+                }
+            }
+            throw new RuntimeException("Image save failed, upload rolled back: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<ImagelistDto> getAllImage() {
+
+        List<Images> images = imagesRepository.findAll();
+
+
+        return images.stream().map((image)->(modelMapper.map(image, ImagelistDto.class))).collect(Collectors.toList()) ;
+    }
+
+
+
+
+    @Override
+    public ResponseEntity<Long> getTotalUserCount() {
+
+       Long totaluser=authRepository.count();
+        return ResponseEntity.ok(totaluser);
+    }
+
+    @Override
+    public ResponseEntity<Long> getTotalImageCount() {
+        Long totalimage =  imagesRepository.count();
+        return ResponseEntity.ok(totalimage);
+    }
+
+
+    @Override
+    public ResponseEntity<BigDecimal> getTotalDonationAmount() {
+        return ResponseEntity.ok(donationRepository.getTotalAmount());
+    }
+
+
+
 
 
     private static final Set<String> ALLOWED_SORT_FIELDS = new HashSet<>(Arrays.asList("id", "username", "createdAt", "roles"));
@@ -125,8 +218,8 @@ public class adminServiceImpl implements AdminService {
         pagination.put("pageSize", userPage.getSize());
         pagination.put("hasNext", userPage.hasNext());
         pagination.put("hasPrevious", userPage.hasPrevious());
-        pagination.put("nextPage",userPage.hasNext() ? userPage.getNumber() +1 : null);
-        pagination.put("previousPage",userPage.hasPrevious() ? userPage.getNumber()-1:null);
+        pagination.put("nextPage", userPage.hasNext() ? userPage.getNumber() + 1 : null);
+        pagination.put("previousPage", userPage.hasPrevious() ? userPage.getNumber() - 1 : null);
 
 
         Map<String, Object> response = new HashMap<>();

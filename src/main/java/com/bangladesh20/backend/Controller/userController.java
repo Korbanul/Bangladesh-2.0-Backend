@@ -3,6 +3,7 @@ import com.bangladesh20.backend.Dto.Auth.ProfileResponseDto;
 import com.bangladesh20.backend.Dto.Donation.DonationResponseDto;
 import com.bangladesh20.backend.Dto.Userservice.UserUpdateDto;
 import com.bangladesh20.backend.Entity.Users;
+import com.bangladesh20.backend.Repository.ImagesRepository;
 import com.bangladesh20.backend.Service.donationService;
 import com.bangladesh20.backend.Service.userService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 public class userController {
     private final userService userService;
     private final donationService donationService;
+
 
     @GetMapping("/profile")
     @PreAuthorize("hasAuthority('profile:read')")
@@ -41,6 +43,11 @@ public class userController {
         return ResponseEntity.ok(donationService.userDonationList());
     }
 
+    @GetMapping("/total-image")
+
+    public ResponseEntity<Long>totalImage(){
+        return userService.getTotalImageCount();
+    }
 
 
 }

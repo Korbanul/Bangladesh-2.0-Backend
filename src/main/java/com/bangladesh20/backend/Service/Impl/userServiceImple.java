@@ -6,6 +6,7 @@ import com.bangladesh20.backend.Dto.Userservice.UserUpdateDto;
 import com.bangladesh20.backend.Entity.Role;
 import com.bangladesh20.backend.Entity.Type.Gender;
 import com.bangladesh20.backend.Entity.Users;
+import com.bangladesh20.backend.Repository.ImagesRepository;
 import com.bangladesh20.backend.Repository.authRepository;
 import com.bangladesh20.backend.Service.userService;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class userServiceImple implements userService {
     private final authRepository authRepository;
     private final ModelMapper modelmapper;
+    private final ImagesRepository imagesRepository;
 
     @Override
     public ProfileResponseDto getUser(Long id) {
@@ -62,6 +64,12 @@ public class userServiceImple implements userService {
 //        }
         authRepository.save(user);
         return ResponseEntity.ok("Profile Updated");
+    }
+
+    @Override
+    public ResponseEntity<Long> getTotalImageCount() {
+      Long totalimage =  imagesRepository.count();
+        return ResponseEntity.ok(totalimage);
     }
 }
 
