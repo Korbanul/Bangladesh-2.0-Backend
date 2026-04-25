@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 
 
 public interface authService {
@@ -17,4 +18,5 @@ public interface authService {
      LoginResponseDto Login(LoginRequestDto loginRequestDto);
 
     ResponseEntity<?> logout(HttpServletResponse response);
+
 }

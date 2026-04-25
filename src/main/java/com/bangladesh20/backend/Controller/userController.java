@@ -1,9 +1,11 @@
 package com.bangladesh20.backend.Controller;
 import com.bangladesh20.backend.Dto.Auth.ProfileResponseDto;
 import com.bangladesh20.backend.Dto.Donation.DonationResponseDto;
+import com.bangladesh20.backend.Dto.NewsDto.NewsResponseDto;
 import com.bangladesh20.backend.Dto.Userservice.UserUpdateDto;
 import com.bangladesh20.backend.Entity.Users;
 import com.bangladesh20.backend.Repository.ImagesRepository;
+import com.bangladesh20.backend.Service.authService;
 import com.bangladesh20.backend.Service.donationService;
 import com.bangladesh20.backend.Service.userService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -21,6 +24,7 @@ import java.util.List;
 public class userController {
     private final userService userService;
     private final donationService donationService;
+    private final authService authService;
 
 
     @GetMapping("/profile")
@@ -49,5 +53,15 @@ public class userController {
         return userService.getTotalImageCount();
     }
 
+    @GetMapping("/total-donation")
+    public ResponseEntity<BigDecimal>totalDonation(){
+        return userService.getTotalDonationAmount();
+    }
+
+    @GetMapping("/all-news")
+    public ResponseEntity<List<NewsResponseDto>> getAllNews(){
+
+        return ResponseEntity.ok(userService.GetAllNews());
+    }
 
 }

@@ -1,13 +1,12 @@
 package com.bangladesh20.backend.Service.Impl;
 
 import com.bangladesh20.backend.Dto.AdminDtos.userDetailsDto;
+import com.bangladesh20.backend.Dto.NewsDto.NewsResponseDto;
 import com.bangladesh20.backend.Entity.Images;
+import com.bangladesh20.backend.Entity.News;
 import com.bangladesh20.backend.Entity.Role;
 import com.bangladesh20.backend.Entity.Users;
-import com.bangladesh20.backend.Repository.ImagesRepository;
-import com.bangladesh20.backend.Repository.RoleRepository;
-import com.bangladesh20.backend.Repository.authRepository;
-import com.bangladesh20.backend.Repository.donationRepository;
+import com.bangladesh20.backend.Repository.*;
 import com.bangladesh20.backend.Service.AdminService;
 import com.cloudinary.Cloudinary;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +37,7 @@ public class adminServiceImpl implements AdminService {
     private final Cloudinary cloudinary;
     private final ImagesRepository imagesRepository;
     private final donationRepository donationRepository;
+    private final NewsRepository newsRepository;
 
     @Override
     public Long deleteUser(Long id) {
@@ -124,6 +124,52 @@ public class adminServiceImpl implements AdminService {
     public ResponseEntity<BigDecimal> getTotalDonationAmount() {
         return ResponseEntity.ok(donationRepository.getTotalAmount());
     }
+
+    
+    
+    @Override
+    public Map createNews(String title, String description, MultipartFile image) {
+        
+        Map <String,Object> options=new HashMap<>();
+        String publicId=null;
+        options.put("folder", "admin-newsImg");
+        options.put("resource_type", "image");
+        try{
+            Map result = cloudinary.uploader().upload(image.getBytes(),options);
+            publicId=(String)result.get("public_id");
+
+            News news= News.builder()
+                    .title(title)
+                    .description(description)
+                    .publicId(publicId)
+                    .imgUrl((String) result.get("secure_url"))
+                    .build();
+
+            newsRepository.save(news);
+            return result;
+        }catch (IOException e)
+        {
+            throw new RuntimeException("News Image upload to cloudinary failed ");
+        }catch (Exception e){
+            if(publicId!=null){
+                try{
+                    cloudinary.uploader().destroy(publicId,new HashMap<>());//here destroy need 2 parameter 2nd one is for option so i am passing empty map. options = empty = use all defaults
+                    log.warn("Rolled back Cloudinary image: {}", publicId);
+                } catch (Exception ex) {
+                    log.error("Cloudinary rollback failed for: {}. Manual cleanup needed.", publicId);
+                }
+            }
+            throw new RuntimeException("News creation failed, upload rolled back: " + e.getMessage(), e);
+        }
+    }
+
+
+    @Override
+    public List<NewsResponseDto> GetAllNews() {
+        List<News> newsList =newsRepository.findAllByOrderByCreatedAtDesc();
+        return newsList.stream().map((news)->(modelMapper.map(news, NewsResponseDto.class))).collect(Collectors.toList());
+    }
+
 
 
 

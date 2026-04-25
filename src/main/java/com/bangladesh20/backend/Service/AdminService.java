@@ -1,4 +1,5 @@
 package com.bangladesh20.backend.Service;
+import com.bangladesh20.backend.Dto.NewsDto.NewsResponseDto;
 import com.bangladesh20.backend.Service.Impl.ImagelistDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,4 +25,8 @@ public interface AdminService {
     ResponseEntity<Long> getTotalImageCount();
 
     ResponseEntity<BigDecimal> getTotalDonationAmount();
+
+    Map createNews(String title, String description, MultipartFile image);
+
+    List<NewsResponseDto> GetAllNews();
 }

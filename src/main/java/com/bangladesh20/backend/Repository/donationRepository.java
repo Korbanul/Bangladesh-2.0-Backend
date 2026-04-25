@@ -16,4 +16,9 @@ public interface donationRepository extends JpaRepository<Donation, Long> {
     @Query("SELECT COALESCE(SUM(d.amount), 0) FROM Donation d")
     BigDecimal getTotalAmount();
     //COALESCE(..., 0) returns 0 instead of null when table is empty.
+
+    // Sum all donations for a specific user
+    @Query("SELECT COALESCE(SUM(d.amount), 0) FROM Donation d WHERE d.user.id = :id")
+    BigDecimal getTotalAmount(Long id);
+
 }
