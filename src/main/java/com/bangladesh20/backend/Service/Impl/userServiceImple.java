@@ -15,6 +15,7 @@ import com.bangladesh20.backend.Repository.donationRepository;
 import com.bangladesh20.backend.Service.userService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -93,6 +95,12 @@ public class userServiceImple implements userService {
     public List<NewsResponseDto> GetAllNews() {
         List<News> newsList =newsRepository.findAllByOrderByCreatedAtDesc();
         return newsList.stream().map((news)->(modelMapper.map(news, NewsResponseDto.class))).collect(Collectors.toList());
+    }
+
+    @Override
+    public NewsResponseDto GetNews(Long id) {
+        News news=newsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("News does not exist"));
+        return modelMapper.map(news, NewsResponseDto.class);
     }
 }
 

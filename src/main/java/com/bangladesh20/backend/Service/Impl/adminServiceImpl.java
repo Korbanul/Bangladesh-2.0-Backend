@@ -2,10 +2,7 @@ package com.bangladesh20.backend.Service.Impl;
 
 import com.bangladesh20.backend.Dto.AdminDtos.userDetailsDto;
 import com.bangladesh20.backend.Dto.NewsDto.NewsResponseDto;
-import com.bangladesh20.backend.Entity.Images;
-import com.bangladesh20.backend.Entity.News;
-import com.bangladesh20.backend.Entity.Role;
-import com.bangladesh20.backend.Entity.Users;
+import com.bangladesh20.backend.Entity.*;
 import com.bangladesh20.backend.Repository.*;
 import com.bangladesh20.backend.Service.AdminService;
 import com.cloudinary.Cloudinary;
@@ -38,6 +35,7 @@ public class adminServiceImpl implements AdminService {
     private final ImagesRepository imagesRepository;
     private final donationRepository donationRepository;
     private final NewsRepository newsRepository;
+    private final paymentMethodRepository paymentMethodRepository;
 
     @Override
     public Long deleteUser(Long id) {
@@ -47,7 +45,6 @@ public class adminServiceImpl implements AdminService {
         authRepository.deleteById(id);
         return id;
     }
-
 
 
     @Override
@@ -60,14 +57,14 @@ public class adminServiceImpl implements AdminService {
         options.put("resource_type", "image");
         try {
             Map result = cloudinary.uploader().upload(file.getBytes(), options);
-                    publicId=(String) result.get("public_id");
-            Images images=Images.builder()
+            publicId = (String) result.get("public_id");
+            Images images = Images.builder()
                     .imageUrl((String) result.get("secure_url"))
                     .format((String) result.get("format"))
                     .publicId((String) result.get("public_id"))
                     .sizeBytes(((Number) result.get("bytes")).longValue())
-                    .width((int)result.get("width"))
-                    .height((int)result.get("height"))
+                    .width((int) result.get("width"))
+                    .height((int) result.get("height"))
 
                     .build();
 
@@ -78,7 +75,7 @@ public class adminServiceImpl implements AdminService {
         } catch (IOException e) {
 
             throw new RuntimeException("Image Upload Exception From Cloudinary" + e.getMessage());
-        }catch (Exception e) {
+        } catch (Exception e) {
             // This will run when image already uploaded to the cloudinary but due to any error details not saved to our DB
             // Then we need to delete the image form cloudinary. To avoid duplicate image in Cloudinary.
             if (publicId != null) {
@@ -100,22 +97,20 @@ public class adminServiceImpl implements AdminService {
         List<Images> images = imagesRepository.findAll();
 
 
-        return images.stream().map((image)->(modelMapper.map(image, ImagelistDto.class))).collect(Collectors.toList()) ;
+        return images.stream().map((image) -> (modelMapper.map(image, ImagelistDto.class))).collect(Collectors.toList());
     }
-
-
 
 
     @Override
     public ResponseEntity<Long> getTotalUserCount() {
 
-       Long totaluser=authRepository.count();
+        Long totaluser = authRepository.count();
         return ResponseEntity.ok(totaluser);
     }
 
     @Override
     public ResponseEntity<Long> getTotalImageCount() {
-        Long totalimage =  imagesRepository.count();
+        Long totalimage = imagesRepository.count();
         return ResponseEntity.ok(totalimage);
     }
 
@@ -125,20 +120,19 @@ public class adminServiceImpl implements AdminService {
         return ResponseEntity.ok(donationRepository.getTotalAmount());
     }
 
-    
-    
+
     @Override
     public Map createNews(String title, String description, MultipartFile image) {
-        
-        Map <String,Object> options=new HashMap<>();
-        String publicId=null;
+
+        Map<String, Object> options = new HashMap<>();
+        String publicId = null;
         options.put("folder", "admin-newsImg");
         options.put("resource_type", "image");
-        try{
-            Map result = cloudinary.uploader().upload(image.getBytes(),options);
-            publicId=(String)result.get("public_id");
+        try {
+            Map result = cloudinary.uploader().upload(image.getBytes(), options);
+            publicId = (String) result.get("public_id");
 
-            News news= News.builder()
+            News news = News.builder()
                     .title(title)
                     .description(description)
                     .publicId(publicId)
@@ -147,13 +141,12 @@ public class adminServiceImpl implements AdminService {
 
             newsRepository.save(news);
             return result;
-        }catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new RuntimeException("News Image upload to cloudinary failed ");
-        }catch (Exception e){
-            if(publicId!=null){
-                try{
-                    cloudinary.uploader().destroy(publicId,new HashMap<>());//here destroy need 2 parameter 2nd one is for option so i am passing empty map. options = empty = use all defaults
+        } catch (Exception e) {
+            if (publicId != null) {
+                try {
+                    cloudinary.uploader().destroy(publicId, new HashMap<>());//here destroy need 2 parameter 2nd one is for option so i am passing empty map. options = empty = use all defaults
                     log.warn("Rolled back Cloudinary image: {}", publicId);
                 } catch (Exception ex) {
                     log.error("Cloudinary rollback failed for: {}. Manual cleanup needed.", publicId);
@@ -166,13 +159,9 @@ public class adminServiceImpl implements AdminService {
 
     @Override
     public List<NewsResponseDto> GetAllNews() {
-        List<News> newsList =newsRepository.findAllByOrderByCreatedAtDesc();
-        return newsList.stream().map((news)->(modelMapper.map(news, NewsResponseDto.class))).collect(Collectors.toList());
+        List<News> newsList = newsRepository.findAllByOrderByCreatedAtDesc();
+        return newsList.stream().map((news) -> (modelMapper.map(news, NewsResponseDto.class))).collect(Collectors.toList());
     }
-
-
-
-
 
 
     private static final Set<String> ALLOWED_SORT_FIELDS = new HashSet<>(Arrays.asList("id", "username", "createdAt", "roles"));
@@ -276,6 +265,43 @@ public class adminServiceImpl implements AdminService {
 
     }
 
+    @Override
+    public NewsResponseDto GetNews(Long id) {
+        News news = newsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("News does not exist"));
+        return modelMapper.map(news, NewsResponseDto.class);
+    }
+
+    @Override
+    public void deleteNews(Long id) {
+
+        News news = newsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("News does not exist with id: "+id));
+
+        String publicId = news.getPublicId();
+        Map<String, Object> options = new HashMap<>();
+        options.put("folder", "admin-newsImg");
+        options.put("resource_type", "image");
+//
+        try {
+            cloudinary.uploader().destroy(news.getPublicId(), options);
+        } catch (IOException e) {
+            // Log the error but decide if you want to stop the DB deletion
+            throw new RuntimeException("Failed to delete image from Cloudinary");
+        }
+        newsRepository.deleteById(id);
+    }
+
+    @Override
+    public void chnageMethodStatus(Long id) {
+        paymentMethod paymentMethod=paymentMethodRepository.findById(id).orElseThrow(()->new IllegalArgumentException("News does not exist with id: "+id));
+        paymentMethod.setActive(!paymentMethod.getActive());
+        paymentMethodRepository.save(paymentMethod);
+    }
+
+    @Override
+    public void DeletePaymentMethod(Long id) {
+        paymentMethod paymentMethod=paymentMethodRepository.findById(id).orElseThrow(()->new IllegalArgumentException("News does not exist with id: "+id));
+        paymentMethodRepository.deleteById(id);
+    }
 
 }
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public interface userService {
@@ -20,4 +21,7 @@ public interface userService {
     ResponseEntity<BigDecimal> getTotalDonationAmount();
 
     List<NewsResponseDto> GetAllNews();
+
+
+    NewsResponseDto GetNews(Long id);
 }

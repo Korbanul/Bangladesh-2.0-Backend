@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -62,6 +63,11 @@ public class userController {
     public ResponseEntity<List<NewsResponseDto>> getAllNews(){
 
         return ResponseEntity.ok(userService.GetAllNews());
+    }
+    @GetMapping("/news/{id}")
+    public ResponseEntity<NewsResponseDto> getNews(@PathVariable Long id){
+
+        return ResponseEntity.ok(userService.GetNews(id));
     }
 
 }

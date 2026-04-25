@@ -29,4 +29,13 @@ public interface AdminService {
     Map createNews(String title, String description, MultipartFile image);
 
     List<NewsResponseDto> GetAllNews();
+
+    NewsResponseDto GetNews(Long id);
+
+
+    void deleteNews(Long id);
+
+    void chnageMethodStatus(Long id);
+
+    void DeletePaymentMethod(Long id);
 }

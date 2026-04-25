@@ -152,5 +152,30 @@ public class adminController {
         return ResponseEntity.ok(adminService.GetAllNews());
     }
 
+    @GetMapping("/news/{id}")
+    public ResponseEntity<NewsResponseDto> getNews(@PathVariable Long id){
+
+        return ResponseEntity.ok(adminService.GetNews(id));
+    }
+    @DeleteMapping("/delete-news/{id}")
+    public ResponseEntity<Void> deleteNews(@PathVariable Long id){
+
+        adminService.deleteNews(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/payment-method/change-status/{id}")
+    public ResponseEntity<Void>ChangeStatus(@PathVariable Long id) {
+        adminService.chnageMethodStatus(id);
+        return ResponseEntity.noContent().build();
+
+    }
+    @DeleteMapping("/payment-method/delete/{id}")
+    public ResponseEntity<Void>deletePaymentMethod(@PathVariable Long id) {
+        adminService.DeletePaymentMethod(id);
+        return ResponseEntity.noContent().build();
+
+    }
+
 
 }

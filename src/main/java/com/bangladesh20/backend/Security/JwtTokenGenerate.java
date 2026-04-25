@@ -1,5 +1,6 @@
 package com.bangladesh20.backend.Security;
 
+import com.bangladesh20.backend.Entity.Role;
 import com.bangladesh20.backend.Entity.Users;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -28,6 +30,9 @@ public class JwtTokenGenerate {
         return Jwts.builder()
                 .subject(users.getId().toString())
                 .claim("userId",users.getId().toString())
+                .claim("roles", users.getRoles().stream()
+                        .map(Role::getName)// same role -> role.getName()
+                        .collect(Collectors.toList()))//
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis()+1000*60*15))
                 .signWith(getSecrectKey())
