@@ -147,30 +147,37 @@ public class adminController {
     }
 
     @GetMapping("/all-news")
-    public ResponseEntity<List<NewsResponseDto>> getAllNews(){
+    public ResponseEntity<List<NewsResponseDto>> getAllNews() {
 
         return ResponseEntity.ok(adminService.GetAllNews());
     }
 
     @GetMapping("/news/{id}")
-    public ResponseEntity<NewsResponseDto> getNews(@PathVariable Long id){
+    public ResponseEntity<NewsResponseDto> getNews(@PathVariable Long id) {
 
         return ResponseEntity.ok(adminService.GetNews(id));
     }
+
     @DeleteMapping("/delete-news/{id}")
-    public ResponseEntity<Void> deleteNews(@PathVariable Long id){
+    public ResponseEntity<Void> deleteNews(@PathVariable Long id) {
 
         adminService.deleteNews(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/payment-method/change-status/{id}")
-    public ResponseEntity<Void>ChangeStatus(@PathVariable Long id) {
+    public ResponseEntity<Void> ChangeStatus(@PathVariable Long id) {
         adminService.chnageMethodStatus(id);
         return ResponseEntity.noContent().build();
 
     }
 
+    @GetMapping("/recent-donation")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<DonationResponseDto>> getLastThreeNews() {
+        List<DonationResponseDto> threedonationlist = adminService.getRecentDonation();
+        return ResponseEntity.ok(threedonationlist);
+    }
 
 
 }

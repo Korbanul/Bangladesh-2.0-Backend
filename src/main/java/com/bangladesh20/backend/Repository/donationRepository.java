@@ -21,4 +21,6 @@ public interface donationRepository extends JpaRepository<Donation, Long> {
     @Query("SELECT COALESCE(SUM(d.amount), 0) FROM Donation d WHERE d.user.id = :id")
     BigDecimal getTotalAmount(Long id);
 
+    List<Donation> findTop3ByOrderByDateAndTimeDesc();
+
 }

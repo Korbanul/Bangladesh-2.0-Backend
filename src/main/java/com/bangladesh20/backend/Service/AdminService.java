@@ -1,4 +1,5 @@
 package com.bangladesh20.backend.Service;
+import com.bangladesh20.backend.Dto.Donation.DonationResponseDto;
 import com.bangladesh20.backend.Dto.NewsDto.NewsResponseDto;
 import com.bangladesh20.backend.Service.Impl.ImagelistDto;
 import org.springframework.http.ResponseEntity;
@@ -37,4 +38,5 @@ public interface AdminService {
 
     void chnageMethodStatus(Long id);
 
+    List<DonationResponseDto> getRecentDonation();
 }

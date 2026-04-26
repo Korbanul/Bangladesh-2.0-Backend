@@ -1,6 +1,7 @@
 package com.bangladesh20.backend.Service.Impl;
 
 import com.bangladesh20.backend.Dto.AdminDtos.userDetailsDto;
+import com.bangladesh20.backend.Dto.Donation.DonationResponseDto;
 import com.bangladesh20.backend.Dto.NewsDto.NewsResponseDto;
 import com.bangladesh20.backend.Entity.*;
 import com.bangladesh20.backend.Repository.*;
@@ -295,6 +296,26 @@ public class adminServiceImpl implements AdminService {
         paymentMethod paymentMethod = paymentMethodRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("News does not exist with id: " + id));
         paymentMethod.setActive(!paymentMethod.getActive());
         paymentMethodRepository.save(paymentMethod);
+    }
+
+    @Override
+    public List<DonationResponseDto> getRecentDonation() {
+
+        List<Donation> lastthreedonation=donationRepository.findTop3ByOrderByDateAndTimeDesc();
+
+        return (lastthreedonation.stream().map((item) ->
+                DonationResponseDto.builder()
+                        .transactionId(item.getTransactionId())
+                        .amount(item.getAmount())
+                        .id(item.getId())
+                        .method(item.getMethod())
+                        .status(item.getStatus())
+                        .donorName(item.getUser() == null ? item.getGuestName() : item.getUser().getUsername())
+                        .donationDateTime(item.getDateAndTime())
+                        .donorPhone(item.getUser() == null ? item.getGuestPhone() : item.getUserPhone())
+                        .build()
+        ))
+                .collect(Collectors.toList());
     }
 
 }
