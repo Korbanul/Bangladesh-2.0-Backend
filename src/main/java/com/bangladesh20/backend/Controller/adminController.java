@@ -170,12 +170,7 @@ public class adminController {
         return ResponseEntity.noContent().build();
 
     }
-    @DeleteMapping("/payment-method/delete/{id}")
-    public ResponseEntity<Void>deletePaymentMethod(@PathVariable Long id) {
-        adminService.DeletePaymentMethod(id);
-        return ResponseEntity.noContent().build();
 
-    }
 
 
 }

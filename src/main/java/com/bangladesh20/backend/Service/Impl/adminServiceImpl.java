@@ -274,7 +274,7 @@ public class adminServiceImpl implements AdminService {
     @Override
     public void deleteNews(Long id) {
 
-        News news = newsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("News does not exist with id: "+id));
+        News news = newsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("News does not exist with id: " + id));
 
         String publicId = news.getPublicId();
         Map<String, Object> options = new HashMap<>();
@@ -292,16 +292,9 @@ public class adminServiceImpl implements AdminService {
 
     @Override
     public void chnageMethodStatus(Long id) {
-        paymentMethod paymentMethod=paymentMethodRepository.findById(id).orElseThrow(()->new IllegalArgumentException("News does not exist with id: "+id));
+        paymentMethod paymentMethod = paymentMethodRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("News does not exist with id: " + id));
         paymentMethod.setActive(!paymentMethod.getActive());
         paymentMethodRepository.save(paymentMethod);
     }
 
-    @Override
-    public void DeletePaymentMethod(Long id) {
-        paymentMethod paymentMethod=paymentMethodRepository.findById(id).orElseThrow(()->new IllegalArgumentException("News does not exist with id: "+id));
-        paymentMethodRepository.deleteById(id);
-    }
-
 }
-

@@ -37,5 +37,4 @@ public interface AdminService {
 
     void chnageMethodStatus(Long id);
 
-    void DeletePaymentMethod(Long id);
 }
